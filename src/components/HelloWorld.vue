@@ -134,9 +134,9 @@
 
       <div class="table__rows">
 
-        <div class="table__row">
+        <div class="table__row table__row_head">
 
-          <div class="table__td">
+          <div class="table__td table__td_active-sort table__td_sort-asc">
             Имя
           </div>
 
@@ -152,7 +152,7 @@
             Департамент
           </div>
 
-          <div class="table__td">
+          <div class="table__td table__td_address">
             Адрес
           </div>
 
@@ -176,7 +176,7 @@
             department
           </div>
 
-          <div class="table__td">
+          <div class="table__td table__td_address">
             Moscow, Fayette Street 923
           </div>
 
@@ -200,7 +200,7 @@
             Backend
           </div>
 
-          <div class="table__td">
+          <div class="table__td table__td_address">
             Moscow, Brighton Avenue 666
           </div>
 
@@ -231,6 +231,7 @@ export default {
     max-width: 1200px;
     margin: 50px auto;
     border: 1px solid black;
+    overflow: auto;
 
     @media (max-width:$mobile-width) {
       max-width: 100%;
@@ -313,8 +314,90 @@ export default {
     width: 100%;
   }
 
+  .table__row {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    justify-content: start;
+    border-bottom: 1px solid black;
+  }
+
+  .table__td {
+    display: block;
+    width: 20%;
+    min-width: 17%;
+    border-right: 1px solid black;
+    word-wrap: break-word;
+    padding: 5px;
+
+    &:last-child {
+      border-width: 0;
+    }
+
+    @media (max-width:$mobile-width) {
+      width: 25%;
+      min-width: 21%;
+    }
+
+  }
+
+  .table__td_active-sort {
+    background-color: gray;
+    color: white;
+    position: relative;
+
+    &:before {
+      content: '';
+      display: block;
+      position: absolute;
+      width: 0;
+      height: 0;
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-bottom: 10px solid white;
+      bottom: 4px;
+      left: 50%;
+      margin-left: -5px;
+    }
+
+  }
+
+  .table__td_sort-asc {
+    &:before {
+      transform: rotate(0deg);
+    }
+  }
+
+  .table__td_sort-desc {
+    &:before {
+      transform: rotate(180deg);
+    }
+  }
+
+  .table__row_head {
+
+    .table__td {
+      font-size: 17px;
+      font-weight: bold;
+      cursor: pointer;
+      padding-top: 15px;
+      padding-bottom: 15px;
+
+      &:hover {
+        background-color: gray;
+        color: white;
+      }
+
+    }
+
+  }
 
 
+  .table__td_address {
+    @media (max-width:$mobile-width) {
+      display: none;
+    }
+  }
 
 
 </style>
