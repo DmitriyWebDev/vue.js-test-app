@@ -228,11 +228,9 @@ export default {
     }
   },
   beforeCreate() {
-
-    setTimeout(() => {
-      this.$store.dispatch('loadUsers')
-    }, 5000)
-
+    if( !this.$store.getters.getUsersForSortTable.length ) {
+      this.$store.dispatch('loadUsers');
+    }
   }
 };
 </script>
