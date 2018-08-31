@@ -1,7 +1,12 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import VueResource from 'vue-resource';
-import {getUsersFiltersAssociations} from "./utils";
+import {
+  getUsersFiltersAssociations,
+  modifyUsersListForBetterOrdering,
+  getAnotherOrderDirectionKey
+} from "./utils";
+const orderBy = require('lodash.orderby');
 import {USERS_API_URL, USERS_FILTERS_KEYS} from "./constants";
 import 'es6-promise/auto';
 
@@ -16,11 +21,11 @@ export default new Vuex.Store({
     count : 0,
 
     usersInitialList  : [],
-    usersModifiedList : [],
+    usersModifiedList : [], // sorted, ordered list for table
 
     usersListOrderParams : {
       orderKey: false,
-      orderDirection: 'asc' // or desc
+      orderDirection: getAnotherOrderDirectionKey() // asc or desc
     },
 
     usersListFilters : {
@@ -61,19 +66,41 @@ export default new Vuex.Store({
   },
   getters: {
     getUsersForSortTable: state => {
-      return state.usersModifiedList
+      return state.usersModifiedList;
     },
     getUsersFiltersValuesAssociations: state => {
-      return state.usersListFilters.filtersValuesAssociations
+      return state.usersListFilters.filtersValuesAssociations;
+    },
+    getUsersOrderKey: state => {
+      return state.usersListOrderParams.orderKey;
+    },
+    getUsersOrderDirection: state => {
+      return state.usersListOrderParams.orderDirection;
     },
   },
   mutations: {
     addLoadedUsers (state, users) {
-      state.usersInitialList  = users.slice();
-      state.usersModifiedList = users.slice();
+      state.usersInitialList  = modifyUsersListForBetterOrdering(users);
+      state.usersModifiedList = state.usersInitialList.slice();
     },
     setUsersFiltersValuesAssociations(state, associations) {
       state.usersListFilters.filtersAssociations = associations;
+    },
+    changeUsersListOrder(state, newOrderKey) {
+
+      const oldOrderKey =  state.usersListOrderParams.orderKey;
+      const oldDirection =  state.usersListOrderParams.orderDirection;
+
+      if( newOrderKey === oldOrderKey ) {
+        state.usersListOrderParams.orderDirection = getAnotherOrderDirectionKey(oldDirection);
+      } else {
+        state.usersListOrderParams.orderKey = newOrderKey;
+        state.usersListOrderParams.orderDirection = getAnotherOrderDirectionKey();
+      }
+
+      const newDirection = state.usersListOrderParams.orderDirection;
+      state.usersModifiedList = orderBy(state.usersModifiedList, [newOrderKey], [newDirection])
+
     }
   },
   actions: {

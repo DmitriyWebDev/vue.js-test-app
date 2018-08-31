@@ -3,7 +3,7 @@
   <div class="table">
     <div class="table__inner">
 
-      {{usersCount}}
+      Users count : {{usersCount}}
 
       <div class="table__filters">
 
@@ -139,75 +139,85 @@
 
         <div class="table__row table__row_head">
 
-          <div class="table__td table__td_active-sort table__td_sort-asc">
+          <div v-on:click="changeOrder('name')"
+               v-bind:class="[
+                (orderKey === 'name') ? 'table__td_active-sort' : '',
+                (orderKey === 'name' && orderDirection === 'asc') ? 'table__td_sort-desc' : 'table__td_sort-asc',
+                orderFilterClass
+               ]"
+          >
             Имя
           </div>
 
-          <div class="table__td">
+          <div v-on:click="changeOrder('age')"
+               v-bind:class="[
+                (orderKey === 'age') ? 'table__td_active-sort' : '',
+                (orderKey === 'age' && orderDirection === 'asc') ? 'table__td_sort-desc' : 'table__td_sort-asc',
+                orderFilterClass
+               ]"
+          >
             Возраст
           </div>
 
-          <div class="table__td">
+          <div v-on:click="changeOrder('gender')"
+               v-bind:class="[
+                (orderKey === 'gender') ? 'table__td_active-sort' : '',
+                (orderKey === 'gender' && orderDirection === 'asc') ? 'table__td_sort-desc' : 'table__td_sort-asc',
+                orderFilterClass
+               ]"
+          >
             Пол
           </div>
 
-          <div class="table__td">
+          <div v-on:click="changeOrder('department')"
+               v-bind:class="[
+                (orderKey === 'department') ? 'table__td_active-sort' : '',
+                (orderKey === 'department' && orderDirection === 'asc') ? 'table__td_sort-desc' : 'table__td_sort-asc',
+                orderFilterClass
+               ]"
+          >
             Департамент
           </div>
 
-          <div class="table__td table__td_address">
+          <div v-on:click="changeOrder('city')"
+               v-bind:class="[
+                (orderKey === 'city') ? 'table__td_active-sort' : '',
+                (orderKey === 'city' && orderDirection === 'asc') ? 'table__td_sort-desc' : 'table__td_sort-asc',
+                orderFilterClass
+               ]"
+          >
             Адрес
           </div>
 
         </div>
 
-        <div class="table__row">
+        <!-- Users rows -->
+
+        <div v-for="user in users" class="table__row">
 
           <div class="table__td">
-            Mendez
+            {{ user.name }}
           </div>
 
           <div class="table__td">
-            30
+            {{ user.age }}
           </div>
 
           <div class="table__td">
-            male
+            {{ user.gender }}
           </div>
 
           <div class="table__td">
-            department
+            {{ user.department }}
           </div>
 
           <div class="table__td table__td_address">
-            Moscow, Fayette Street 923
+            {{ user.address.city }}, {{ user.address.street }}
           </div>
 
         </div>
 
-        <div class="table__row">
-
-          <div class="table__td">
-            Sharon
-          </div>
-
-          <div class="table__td">
-            24
-          </div>
-
-          <div class="table__td">
-            female
-          </div>
-
-          <div class="table__td">
-            Backend
-          </div>
-
-          <div class="table__td table__td_address">
-            Moscow, Brighton Avenue 666
-          </div>
-
-        </div>
+        <!-- END Users rows -->
 
       </div>
 
@@ -216,16 +226,39 @@
 </template>
 
 <script>
-
+import { mapMutations } from 'vuex';
+//changeUsersListOrder
 export default {
   name: 'UsersSortedTable',
+  data: function (){
+    return {
+      orderFilterClass: 'table__td',
+    };
+  },
   props: {
 
+  },
+  methods: {
+    ...mapMutations([
+      'changeUsersListOrder',
+    ]),
+    changeOrder: function (orderKey) {
+      this.changeUsersListOrder(orderKey);
+    }
   },
   computed: {
     usersCount () {
       return this.$store.state.usersInitialList.length
-    }
+    },
+    users() {
+      return this.$store.getters.getUsersForSortTable;
+    },
+    orderKey() {
+      return this.$store.getters.getUsersOrderKey;
+    },
+    orderDirection() {
+      return this.$store.getters.getUsersOrderDirection;
+    },
   },
   beforeCreate() {
     if( !this.$store.getters.getUsersForSortTable.length ) {

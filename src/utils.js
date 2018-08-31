@@ -34,3 +34,24 @@ export function getUsersFiltersAssociations( users, filtersKeys ) {
   return associations;
 
 }
+
+export function modifyUsersListForBetterOrdering(users) {
+
+  const modifiedUsersList = [];
+
+  for(let i = 0; i < users.length; i++) {
+    let user = users[i];
+    user['city'] = user['address']['city'];
+    modifiedUsersList.push(user);
+  }
+
+  return modifiedUsersList;
+
+}
+
+export function getAnotherOrderDirectionKey( currentDirectionKey ) {
+  if( currentDirectionKey === 'asc' ) {
+    return 'desc';
+  }
+  return 'asc';
+}
