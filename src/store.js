@@ -5,9 +5,11 @@ import {
   getUsersFiltersAssociations,
   modifyUsersListForBetterOrdering,
   getAnotherOrderDirectionKey,
-  getUsersFiltersInfoFromAssocObj
+  getUsersFiltersInfoFromAssocObj,
+  findStringInArray,
+  implementFiltersToUsersList
 } from "./utils";
-const orderBy = require('lodash.orderby');
+const _ = require('lodash');
 import {USERS_API_URL, USERS_FILTERS_KEYS} from "./constants";
 import 'es6-promise/auto';
 
@@ -29,6 +31,18 @@ export default new Vuex.Store({
 
     usersListFilters : {
 
+      activeFiltersValuesObj : {
+        // male : '',
+        // Backend: '' ...
+      },
+
+      // activeFiltersValuesList is array
+      // for control applied filters order
+      activeFiltersValuesList : [
+        // 'male',
+        // 'Backend'
+      ],
+
       filtersValuesAssociations : {
         // female : {
         //   filterKey  : 'gender',
@@ -45,6 +59,7 @@ export default new Vuex.Store({
           //   name : 'male',
           //   usersCount : 7
           //   id: 1 (random id for input, label tags)
+          //   isActive: false
           // }, ...
         ],
         department : [],
@@ -114,7 +129,66 @@ export default new Vuex.Store({
       }
 
       const newDirection = state.usersListOrderParams.orderDirection;
-      state.usersModifiedList = orderBy(state.usersModifiedList, [newOrderKey], [newDirection])
+      state.usersModifiedList = _.orderBy(state.usersModifiedList, [newOrderKey], [newDirection])
+
+    },
+    filterUsersList(state, filterParam) {
+
+      console.log( '--- Mutation. filterUsersList()' )
+
+      // Change filters data
+
+      let activeFiltersValuesObj = state.usersListFilters.activeFiltersValuesObj;
+      let activeFiltersValuesList = state.usersListFilters.activeFiltersValuesList;
+
+      if( typeof activeFiltersValuesObj[`${filterParam}`] === 'undefined' ) {
+        activeFiltersValuesObj[`${filterParam}`] = '';
+      } else {
+        delete activeFiltersValuesObj[`${filterParam}`];
+      }
+
+      const filterParamIndex = findStringInArray(activeFiltersValuesList, filterParam);
+
+      if( filterParamIndex !== null ) {
+        activeFiltersValuesList.splice(filterParamIndex, 1);
+      } else {
+        activeFiltersValuesList.push(filterParam);
+      }
+
+      // END Change filters data
+
+      // Filter users list
+
+      const initialUsersList = state.usersInitialList.slice();
+      let filtersAssociations = state.usersListFilters.filtersAssociations;
+      const filteredUsersList = implementFiltersToUsersList(
+          initialUsersList,
+          activeFiltersValuesList.slice(),
+          filtersAssociations
+      );
+
+      state.usersModifiedList = filteredUsersList;
+
+      // END Filter users list
+
+      // Set filters view
+
+      filtersAssociations = getUsersFiltersAssociations(filteredUsersList, USERS_FILTERS_KEYS);
+
+      const filtersData = getUsersFiltersInfoFromAssocObj(filtersAssociations, USERS_FILTERS_KEYS, activeFiltersValuesObj);
+      const stateUsersFilters = state.usersListFilters.filters;
+
+      for( let i = 0; i < USERS_FILTERS_KEYS.length; i++ ) {
+
+        const filterKey = USERS_FILTERS_KEYS[i];
+
+        if( typeof filtersData[`${filterKey}`] !== 'undefined' ) {
+          stateUsersFilters[`${filterKey}`] = filtersData[`${filterKey}`];
+        }
+
+      }
+
+      // END filters view
 
     }
   },
@@ -125,11 +199,13 @@ export default new Vuex.Store({
 
         (data) => {
 
-          const filtersAssociations = getUsersFiltersAssociations(data.body, USERS_FILTERS_KEYS);
-          context.commit('addLoadedUsers', data.body);
+          const users = data.body;
+          const filtersAssociations = getUsersFiltersAssociations(users, USERS_FILTERS_KEYS);
+
+          context.commit('addLoadedUsers', users);
           context.commit('setUsersFiltersValuesAssociations', filtersAssociations);
 
-          const filtersData = getUsersFiltersInfoFromAssocObj(filtersAssociations, USERS_FILTERS_KEYS);
+          const filtersData = getUsersFiltersInfoFromAssocObj(filtersAssociations, USERS_FILTERS_KEYS, {/* no active filters */});
 
           const filtersViewPayload = {
             filtersData : filtersData,

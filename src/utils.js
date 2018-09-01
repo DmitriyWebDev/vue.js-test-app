@@ -1,7 +1,9 @@
-export function getUsersFiltersAssociations( users, filtersKeys ) {
+const _ = require('lodash');
+
+export function getUsersFiltersAssociations( users = [], filtersKeys = [] ) {
 
   let associations = {};
-  let  filtersKeysObj = {};
+  let filtersKeysObj = {};
 
   for( let i = 0; i < filtersKeys.length; i++ ) {
     const key = filtersKeys[i];
@@ -48,13 +50,17 @@ export function getUsersFiltersAssociations( users, filtersKeys ) {
       assocObj[`${assocKey}`] = newAssociation;
     } else {
       assocObj[`${assocKey}`]['usersCount'] += 1;
+      if( checkKey === 'city' ) {
+        console.log( 'control' )
+        console.log(assocObj)
+      }
     }
 
   }
 
 }
 
-export function getUsersFiltersInfoFromAssocObj( assocObj, filtersKeys ) {
+export function getUsersFiltersInfoFromAssocObj( assocObj = {}, filtersKeys = [], activeFiltersObj = {} ) {
 
   let result = {
 
@@ -83,10 +89,13 @@ export function getUsersFiltersInfoFromAssocObj( assocObj, filtersKeys ) {
 
       if( item['filterKey'] === currentFilterKey ) {
 
+        let isActive = typeof activeFiltersObj[`${key}`] !== 'undefined';
+
         result[`${currentFilterKey}`].push({
           name : key,
           usersCount : item['usersCount'],
-          id: item['filterId']
+          id: item['filterId'],
+          isActive
         });
 
       }
@@ -100,7 +109,7 @@ export function getUsersFiltersInfoFromAssocObj( assocObj, filtersKeys ) {
 
 }
 
-export function modifyUsersListForBetterOrdering(users) {
+export function modifyUsersListForBetterOrdering( users = [] ) {
 
   const modifiedUsersList = [];
 
@@ -114,7 +123,7 @@ export function modifyUsersListForBetterOrdering(users) {
 
 }
 
-export function getAnotherOrderDirectionKey( currentDirectionKey ) {
+export function getAnotherOrderDirectionKey( currentDirectionKey = '' ) {
   if( currentDirectionKey === 'asc' ) {
     return 'desc';
   }
@@ -124,4 +133,47 @@ export function getAnotherOrderDirectionKey( currentDirectionKey ) {
 export function getRandomId() {
   // https://gist.github.com/6174/6062387
   return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+}
+
+export function findStringInArray( array, string ) {
+
+  let result = null;
+
+  for( let i = 0; i < array.length; i++ ) {
+
+    const item = array[i];
+
+    if( item === string ) {
+      result = i;
+      break;
+    }
+
+  }
+
+  return result;
+
+}
+
+export function implementFiltersToUsersList( list = [], filters = [], filtersAssociations = {} ) {
+
+  if( !filters.length ) {
+    return list;
+  }
+
+  let filteredList = list.slice();
+
+  for( let i = 0; i < filters.length; i++ ) {
+
+    const filterValue = filters[i];
+    const filterKey = filtersAssociations[`${filterValue}`]['filterKey'];
+
+    let filterParam = {};
+    filterParam[`${filterKey}`] = filterValue;
+
+    filteredList = _.filter(filteredList, filterParam);
+
+  }
+
+  return filteredList;
+
 }

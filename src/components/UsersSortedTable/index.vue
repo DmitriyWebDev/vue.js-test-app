@@ -17,7 +17,11 @@
 
             <label v-for="filter in genderFilters" :key="filter.id" :for="filter.id" class="table__filters-item-option">
 
-              <input :id="filter.id" type="checkbox" :value="filter.name">
+              <input :id="filter.id"
+                     type="checkbox"
+                     :value="filter.name"
+                     :checked="filter.isActive"
+                     v-on:change="filterList(filter.name)">
 
               <span class="table__filters-item-option-name">
                   {{filter.name}} ({{filter.usersCount}})
@@ -39,7 +43,11 @@
 
             <label v-for="filter in departmentFilters" :key="filter.id" :for="filter.id" class="table__filters-item-option">
 
-              <input :id="filter.id" type="checkbox" :value="filter.name">
+              <input :id="filter.id"
+                     type="checkbox"
+                     :value="filter.name"
+                     :checked="filter.isActive"
+                     v-on:change="filterList(filter.name)">
 
               <span class="table__filters-item-option-name">
                   {{filter.name}} ({{filter.usersCount}})
@@ -61,7 +69,11 @@
 
             <label v-for="filter in cityFilters" :key="filter.id" :for="filter.id" class="table__filters-item-option">
 
-              <input :id="filter.id" type="checkbox" :value="filter.name">
+              <input :id="filter.id"
+                     type="checkbox"
+                     :value="filter.name"
+                     :checked="filter.isActive"
+                     v-on:change="filterList(filter.name)">
 
               <span class="table__filters-item-option-name">
                   {{filter.name}} ({{filter.usersCount}})
@@ -169,6 +181,7 @@
 
     </div>
   </div>
+
 </template>
 
 <script>
@@ -186,9 +199,13 @@ export default {
   methods: {
     ...mapMutations([
       'changeUsersListOrder',
+      'filterUsersList'
     ]),
     changeOrder: function (orderKey) {
       this.changeUsersListOrder(orderKey);
+    },
+    filterList: function (filter) {
+      this.filterUsersList(filter);
     }
   },
   computed: {
