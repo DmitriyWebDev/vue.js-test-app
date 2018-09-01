@@ -1,6 +1,6 @@
 const _ = require('lodash');
 
-export function getUsersFiltersAssociations( users = [], filtersKeys = [] ) {
+export function getUsersFiltersAssociations( users = [], filtersKeys = [], debug = false ) {
 
   let associations = {};
   let filtersKeysObj = {};
@@ -8,6 +8,11 @@ export function getUsersFiltersAssociations( users = [], filtersKeys = [] ) {
   for( let i = 0; i < filtersKeys.length; i++ ) {
     const key = filtersKeys[i];
     filtersKeysObj[`${key}`] = '';
+  }
+
+  if( debug ) {
+    console.log( 'Debug. users.length' )
+    console.log( users.length )
   }
 
   for( let i = 0; i < users.length; i++ ) {
@@ -34,6 +39,11 @@ export function getUsersFiltersAssociations( users = [], filtersKeys = [] ) {
 
   }
 
+  if( debug ) {
+    console.log( 'Debug. Final Associations' )
+    console.log( associations )
+  }
+
   return associations;
 
   // local utils
@@ -49,11 +59,12 @@ export function getUsersFiltersAssociations( users = [], filtersKeys = [] ) {
     if( typeof assocObj[`${assocKey}`] === 'undefined' ) {
       assocObj[`${assocKey}`] = newAssociation;
     } else {
-      assocObj[`${assocKey}`]['usersCount'] += 1;
-      if( checkKey === 'city' ) {
-        console.log( 'control' )
-        console.log(assocObj)
+
+      if( debug && checkKey === 'city' && assocKey === 'Moscow' ) {
+        console.log( 'Moscow +1' )
       }
+
+      assocObj[`${assocKey}`]['usersCount'] += 1;
     }
 
   }
@@ -151,6 +162,20 @@ export function findStringInArray( array, string ) {
   }
 
   return result;
+
+}
+
+export function prepareUsersCityCountInfo(filtersAssociations) {
+
+  for( let key in filtersAssociations ) {
+    if( !filtersAssociations.hasOwnProperty(key) ) continue;
+
+    let item = filtersAssociations[`${key}`];
+    if( item['filterKey'] === 'city' ) {
+      item['usersCount'] /= 2;
+    }
+
+  }
 
 }
 

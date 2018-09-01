@@ -7,7 +7,8 @@ import {
   getAnotherOrderDirectionKey,
   getUsersFiltersInfoFromAssocObj,
   findStringInArray,
-  implementFiltersToUsersList
+  implementFiltersToUsersList,
+  prepareUsersCityCountInfo
 } from "./utils";
 const _ = require('lodash');
 import {USERS_API_URL, USERS_FILTERS_KEYS} from "./constants";
@@ -159,21 +160,26 @@ export default new Vuex.Store({
 
       // Filter users list
 
-      const initialUsersList = state.usersInitialList.slice();
+      const initialUsersList = state.usersInitialList;
       let filtersAssociations = state.usersListFilters.filtersAssociations;
       const filteredUsersList = implementFiltersToUsersList(
           initialUsersList,
-          activeFiltersValuesList.slice(),
+          activeFiltersValuesList,
           filtersAssociations
       );
 
-      state.usersModifiedList = filteredUsersList;
+      const orderKey =  state.usersListOrderParams.orderKey;
+      const direction =  state.usersListOrderParams.orderDirection;
+
+      // set current order
+      state.usersModifiedList = _.orderBy(filteredUsersList, [orderKey], [direction])
 
       // END Filter users list
 
       // Set filters view
 
-      filtersAssociations = getUsersFiltersAssociations(filteredUsersList, USERS_FILTERS_KEYS);
+      filtersAssociations = getUsersFiltersAssociations(filteredUsersList, USERS_FILTERS_KEYS, true);
+      prepareUsersCityCountInfo(filtersAssociations);
 
       const filtersData = getUsersFiltersInfoFromAssocObj(filtersAssociations, USERS_FILTERS_KEYS, activeFiltersValuesObj);
       const stateUsersFilters = state.usersListFilters.filters;
