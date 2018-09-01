@@ -4,7 +4,8 @@ import VueResource from 'vue-resource';
 import {
   getUsersFiltersAssociations,
   modifyUsersListForBetterOrdering,
-  getAnotherOrderDirectionKey
+  getAnotherOrderDirectionKey,
+  getUsersFiltersInfoFromAssocObj
 } from "./utils";
 const orderBy = require('lodash.orderby');
 import {USERS_API_URL, USERS_FILTERS_KEYS} from "./constants";
@@ -18,8 +19,6 @@ Vue.use(VueResource);
 export default new Vuex.Store({
   state: {
 
-    count : 0,
-
     usersInitialList  : [],
     usersModifiedList : [], // sorted, ordered list for table
 
@@ -31,34 +30,25 @@ export default new Vuex.Store({
     usersListFilters : {
 
       filtersValuesAssociations : {
-        // female : 'gender',
-        // Frontend : 'department',
-        // 'New-York' : 'city' ...
+        // female : {
+        //   filterKey  : 'gender',
+        //   filterId   : 1, (random id for input, label tags)
+        //   usersCount : 7
+        // }, ...
       },
 
       filters : {
-        gender : {
-          entries : [
-            // {
-            //   name : 'male',
-            //   usersCount : 7
-            // },
-            // {
-            //   name : 'female',
-            //   usersCount : 8
-            // } ...
-          ]
-        },
-        department : {
-          entries : [
-
-          ]
-        },
-        city: {
-          entries : [
-
-          ]
-        }
+        // ! important info
+        // Keys of this object gotten from array 'USERS_FILTERS_KEYS'
+        gender : [
+          // {
+          //   name : 'male',
+          //   usersCount : 7
+          //   id: 1 (random id for input, label tags)
+          // }, ...
+        ],
+        department : [],
+        city: []
       }
 
     }
@@ -77,6 +67,15 @@ export default new Vuex.Store({
     getUsersOrderDirection: state => {
       return state.usersListOrderParams.orderDirection;
     },
+    getUsersFiltersGender: state => {
+      return state.usersListFilters.filters.gender;
+    },
+    getUsersFiltersDepartment: state => {
+      return state.usersListFilters.filters.department;
+    },
+    getUsersFiltersCity: state => {
+      return state.usersListFilters.filters.city;
+    },
   },
   mutations: {
     addLoadedUsers (state, users) {
@@ -85,6 +84,22 @@ export default new Vuex.Store({
     },
     setUsersFiltersValuesAssociations(state, associations) {
       state.usersListFilters.filtersAssociations = associations;
+    },
+    setUsersFiltersDataForView(state, payload) {
+
+      const stateUsersFilters = state.usersListFilters.filters;
+      const {filtersData, usersFiltersKeys} = payload;
+
+      for( let i = 0; i < usersFiltersKeys.length; i++ ) {
+
+        const filterKey = usersFiltersKeys[i];
+
+        if( typeof filtersData[`${filterKey}`] !== 'undefined' ) {
+          stateUsersFilters[`${filterKey}`] = filtersData[`${filterKey}`];
+        }
+
+      }
+
     },
     changeUsersListOrder(state, newOrderKey) {
 
@@ -111,10 +126,17 @@ export default new Vuex.Store({
         (data) => {
 
           const filtersAssociations = getUsersFiltersAssociations(data.body, USERS_FILTERS_KEYS);
-
-
           context.commit('addLoadedUsers', data.body);
           context.commit('setUsersFiltersValuesAssociations', filtersAssociations);
+
+          const filtersData = getUsersFiltersInfoFromAssocObj(filtersAssociations, USERS_FILTERS_KEYS);
+
+          const filtersViewPayload = {
+            filtersData : filtersData,
+            usersFiltersKeys : USERS_FILTERS_KEYS
+          };
+
+          context.commit('setUsersFiltersDataForView', filtersViewPayload);
 
         },
         (data) => {

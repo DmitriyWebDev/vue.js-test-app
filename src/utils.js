@@ -17,21 +17,86 @@ export function getUsersFiltersAssociations( users, filtersKeys ) {
 
       const key = usersKeys[i];
       let checkKey = key;
+      let assocKey = user[`${checkKey}`];
 
       if( key === 'address' ) {
         checkKey = 'city';
-        if( typeof filtersKeysObj[`${checkKey}`] === 'undefined' ) continue;
-        associations[`${user['address'][`${checkKey}`]}`] = checkKey;
-      } else {
-        if( typeof filtersKeysObj[`${checkKey}`] === 'undefined' ) continue;
-        associations[`${user[`${checkKey}`]}`] = checkKey;
+        assocKey = `${user['address'][`${checkKey}`]}`;
       }
+
+      if( typeof filtersKeysObj[`${checkKey}`] === 'undefined' ) continue;
+
+      _setAssociation( associations, assocKey, checkKey )
 
     }
 
   }
 
   return associations;
+
+  // local utils
+
+  function _setAssociation( assocObj, assocKey, checkKey ) {
+
+    let newAssociation = {
+      filterKey  : checkKey,
+      filterId   : getRandomId(),
+      usersCount : 1
+    };
+
+    if( typeof assocObj[`${assocKey}`] === 'undefined' ) {
+      assocObj[`${assocKey}`] = newAssociation;
+    } else {
+      assocObj[`${assocKey}`]['usersCount'] += 1;
+    }
+
+  }
+
+}
+
+export function getUsersFiltersInfoFromAssocObj( assocObj, filtersKeys ) {
+
+  let result = {
+
+    //gender : [ <-- key from 'filtersKeys' param
+      // {
+      //   name : 'male',
+      //   usersCount : 7
+      //   id: 1 (random id for input, label tags)
+      // }, ...
+    //], ...
+    //department : [...], ...
+
+  };
+
+  for( let i = 0; i < filtersKeys.length; i++ ) {
+
+    const currentFilterKey = filtersKeys[i];
+
+    result[`${currentFilterKey}`] = [];
+
+    for( let key in assocObj ) {
+
+      if( !assocObj.hasOwnProperty( key ) ) continue;
+
+      const item = assocObj[`${key}`];
+
+      if( item['filterKey'] === currentFilterKey ) {
+
+        result[`${currentFilterKey}`].push({
+          name : key,
+          usersCount : item['usersCount'],
+          id: item['filterId']
+        });
+
+      }
+
+    }
+
+
+  }
+
+  return result;
 
 }
 
@@ -54,4 +119,9 @@ export function getAnotherOrderDirectionKey( currentDirectionKey ) {
     return 'desc';
   }
   return 'asc';
+}
+
+export function getRandomId() {
+  // https://gist.github.com/6174/6062387
+  return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 }

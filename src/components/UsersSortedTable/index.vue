@@ -3,7 +3,7 @@
   <div class="table">
     <div class="table__inner">
 
-      Users count : {{usersCount}}
+      <!-- Filters -->
 
       <div class="table__filters">
 
@@ -15,23 +15,13 @@
 
           <div class="table__filters-item-options-list">
 
-            <label for="checkbox-1" class="table__filters-item-option">
+            <label v-for="filter in genderFilters" :key="filter.id" :for="filter.id" class="table__filters-item-option">
 
-              <input id="checkbox-1" type="checkbox" value="male">
-
-              <span class="table__filters-item-option-name">
-                  male (2)
-                </span>
-
-            </label>
-
-            <label for="checkbox-2" class="table__filters-item-option">
-
-              <input id="checkbox-2" type="checkbox" value="female">
+              <input :id="filter.id" type="checkbox" :value="filter.name">
 
               <span class="table__filters-item-option-name">
-                  female (5)
-                </span>
+                  {{filter.name}} ({{filter.usersCount}})
+              </span>
 
             </label>
 
@@ -47,33 +37,13 @@
 
           <div class="table__filters-item-options-list">
 
-            <label for="checkbox-3" class="table__filters-item-option">
+            <label v-for="filter in departmentFilters" :key="filter.id" :for="filter.id" class="table__filters-item-option">
 
-              <input id="checkbox-3" type="checkbox" value="Backend">
-
-              <span class="table__filters-item-option-name">
-                  Backend (2)
-                </span>
-
-            </label>
-
-            <label for="checkbox-4" class="table__filters-item-option">
-
-              <input id="checkbox-4" type="checkbox" value="Hr">
+              <input :id="filter.id" type="checkbox" :value="filter.name">
 
               <span class="table__filters-item-option-name">
-                  Hr (1)
-                </span>
-
-            </label>
-
-            <label for="checkbox-5" class="table__filters-item-option">
-
-              <input id="checkbox-5" type="checkbox" value="Frontend">
-
-              <span class="table__filters-item-option-name">
-                  Frontend (1)
-                </span>
+                  {{filter.name}} ({{filter.usersCount}})
+              </span>
 
             </label>
 
@@ -89,60 +59,33 @@
 
           <div class="table__filters-item-options-list">
 
-            <label for="checkbox-6" class="table__filters-item-option">
+            <label v-for="filter in cityFilters" :key="filter.id" :for="filter.id" class="table__filters-item-option">
 
-              <input id="checkbox-6" type="checkbox" value="Moscow">
-
-              <span class="table__filters-item-option-name">
-                  Moscow (3)
-                </span>
-
-            </label>
-
-            <label for="checkbox-7" class="table__filters-item-option">
-
-              <input id="checkbox-7" type="checkbox" value="New-York">
+              <input :id="filter.id" type="checkbox" :value="filter.name">
 
               <span class="table__filters-item-option-name">
-                  New-York (5)
-                </span>
+                  {{filter.name}} ({{filter.usersCount}})
+              </span>
 
             </label>
-
-            <label for="checkbox-8" class="table__filters-item-option">
-
-              <input id="checkbox-8" type="checkbox" value="Voronezh">
-
-              <span class="table__filters-item-option-name">
-                  Voronezh (2)
-                </span>
-
-            </label>
-
-            <label for="checkbox-9" class="table__filters-item-option">
-
-              <input id="checkbox-9" type="checkbox" value="Spb">
-
-              <span class="table__filters-item-option-name">
-                  Spb (1)
-                </span>
-
-            </label>
-
           </div>
 
         </div>
 
       </div>
 
+      <!-- END Filters -->
+
       <div class="table__rows">
+
+        <!-- Order row -->
 
         <div class="table__row table__row_head">
 
           <div v-on:click="changeOrder('name')"
                v-bind:class="[
                 (orderKey === 'name') ? 'table__td_active-sort' : '',
-                (orderKey === 'name' && orderDirection === 'asc') ? 'table__td_sort-desc' : 'table__td_sort-asc',
+                (orderKey === 'name' && orderDirection === 'asc') ? 'table__td_sort-asc' : 'table__td_sort-desc',
                 orderFilterClass
                ]"
           >
@@ -152,7 +95,7 @@
           <div v-on:click="changeOrder('age')"
                v-bind:class="[
                 (orderKey === 'age') ? 'table__td_active-sort' : '',
-                (orderKey === 'age' && orderDirection === 'asc') ? 'table__td_sort-desc' : 'table__td_sort-asc',
+                (orderKey === 'age' && orderDirection === 'asc') ? 'table__td_sort-asc' : 'table__td_sort-desc',
                 orderFilterClass
                ]"
           >
@@ -162,7 +105,7 @@
           <div v-on:click="changeOrder('gender')"
                v-bind:class="[
                 (orderKey === 'gender') ? 'table__td_active-sort' : '',
-                (orderKey === 'gender' && orderDirection === 'asc') ? 'table__td_sort-desc' : 'table__td_sort-asc',
+                (orderKey === 'gender' && orderDirection === 'asc') ? 'table__td_sort-asc' : 'table__td_sort-desc',
                 orderFilterClass
                ]"
           >
@@ -172,7 +115,7 @@
           <div v-on:click="changeOrder('department')"
                v-bind:class="[
                 (orderKey === 'department') ? 'table__td_active-sort' : '',
-                (orderKey === 'department' && orderDirection === 'asc') ? 'table__td_sort-desc' : 'table__td_sort-asc',
+                (orderKey === 'department' && orderDirection === 'asc') ? 'table__td_sort-asc' : 'table__td_sort-desc',
                 orderFilterClass
                ]"
           >
@@ -182,8 +125,9 @@
           <div v-on:click="changeOrder('city')"
                v-bind:class="[
                 (orderKey === 'city') ? 'table__td_active-sort' : '',
-                (orderKey === 'city' && orderDirection === 'asc') ? 'table__td_sort-desc' : 'table__td_sort-asc',
-                orderFilterClass
+                (orderKey === 'city' && orderDirection === 'asc') ? 'table__td_sort-asc' : 'table__td_sort-desc',
+                orderFilterClass,
+                orderFilterAddressClass
                ]"
           >
             Адрес
@@ -191,9 +135,11 @@
 
         </div>
 
+        <!-- END Order row -->
+
         <!-- Users rows -->
 
-        <div v-for="user in users" class="table__row">
+        <div v-for="user in users" :key="user.id" :data-key="user.id" class="table__row">
 
           <div class="table__td">
             {{ user.name }}
@@ -226,17 +172,16 @@
 </template>
 
 <script>
+
 import { mapMutations } from 'vuex';
-//changeUsersListOrder
+
 export default {
   name: 'UsersSortedTable',
   data: function (){
     return {
       orderFilterClass: 'table__td',
+      orderFilterAddressClass: 'table__td_address'
     };
-  },
-  props: {
-
   },
   methods: {
     ...mapMutations([
@@ -247,9 +192,6 @@ export default {
     }
   },
   computed: {
-    usersCount () {
-      return this.$store.state.usersInitialList.length
-    },
     users() {
       return this.$store.getters.getUsersForSortTable;
     },
@@ -258,6 +200,15 @@ export default {
     },
     orderDirection() {
       return this.$store.getters.getUsersOrderDirection;
+    },
+    genderFilters() {
+      return this.$store.getters.getUsersFiltersGender;
+    },
+    departmentFilters() {
+      return this.$store.getters.getUsersFiltersDepartment;
+    },
+    cityFilters() {
+      return this.$store.getters.getUsersFiltersCity;
     },
   },
   beforeCreate() {
@@ -411,13 +362,13 @@ export default {
 
   .table__td_sort-asc {
     &:before {
-      transform: rotate(0deg);
+        transform: rotate(180deg);
     }
   }
 
   .table__td_sort-desc {
     &:before {
-      transform: rotate(180deg);
+        transform: rotate(0deg);
     }
   }
 
