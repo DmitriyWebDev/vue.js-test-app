@@ -135,8 +135,6 @@ export default new Vuex.Store({
     },
     filterUsersList(state, filterParam) {
 
-      console.log( '--- Mutation. filterUsersList()' )
-
       // Change filters data
 
       let activeFiltersValuesObj = state.usersListFilters.activeFiltersValuesObj;
@@ -178,7 +176,7 @@ export default new Vuex.Store({
 
       // Set filters view
 
-      filtersAssociations = getUsersFiltersAssociations(filteredUsersList, USERS_FILTERS_KEYS, true);
+      filtersAssociations = getUsersFiltersAssociations(filteredUsersList, USERS_FILTERS_KEYS);
       prepareUsersCityCountInfo(filtersAssociations);
 
       const filtersData = getUsersFiltersInfoFromAssocObj(filtersAssociations, USERS_FILTERS_KEYS, activeFiltersValuesObj);

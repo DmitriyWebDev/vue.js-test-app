@@ -1,6 +1,6 @@
 const _ = require('lodash');
 
-export function getUsersFiltersAssociations( users = [], filtersKeys = [], debug = false ) {
+export function getUsersFiltersAssociations( users = [], filtersKeys = [] ) {
 
   let associations = {};
   let filtersKeysObj = {};
@@ -8,11 +8,6 @@ export function getUsersFiltersAssociations( users = [], filtersKeys = [], debug
   for( let i = 0; i < filtersKeys.length; i++ ) {
     const key = filtersKeys[i];
     filtersKeysObj[`${key}`] = '';
-  }
-
-  if( debug ) {
-    console.log( 'Debug. users.length' )
-    console.log( users.length )
   }
 
   for( let i = 0; i < users.length; i++ ) {
@@ -39,11 +34,6 @@ export function getUsersFiltersAssociations( users = [], filtersKeys = [], debug
 
   }
 
-  if( debug ) {
-    console.log( 'Debug. Final Associations' )
-    console.log( associations )
-  }
-
   return associations;
 
   // local utils
@@ -59,11 +49,6 @@ export function getUsersFiltersAssociations( users = [], filtersKeys = [], debug
     if( typeof assocObj[`${assocKey}`] === 'undefined' ) {
       assocObj[`${assocKey}`] = newAssociation;
     } else {
-
-      if( debug && checkKey === 'city' && assocKey === 'Moscow' ) {
-        console.log( 'Moscow +1' )
-      }
-
       assocObj[`${assocKey}`]['usersCount'] += 1;
     }
 
